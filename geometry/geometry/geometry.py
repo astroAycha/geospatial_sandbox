@@ -141,6 +141,28 @@ class Polygon(Geometry):
 
         return abs(area) / 2.0
     
+
+    def n_rings(self):
+        """Return the number of rings in the Polygon"""
+
+        raise NotImplemented
+    
+    def exterior_ring(self):
+        """Return the outermost ring in the Polygon as a LineString"""
+
+        raise NotImplemented
+    
+    def interior_ring(self):
+        """Return the innermost ring in the Polygon as a LineString"""
+
+        raise NotImplemented
+    
+    def perimeter(self):
+        """Return the sum of all the rings"""
+
+        raise NotImplemented
+
+    
     
     def as_text(self) -> str:
         """Get the WKT representation of the geometry"""
