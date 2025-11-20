@@ -93,8 +93,7 @@ class TrackSpecIndex:
             cube = eo_connection.load_collection('SENTINEL2_L2A',
                                              spatial_extent=spatial_ext,
                                              temporal_extent=t,
-                                             bands=["B02", "B04", "B08", 
-                                                    "SCL"])
+                                             bands=["B02", "B04", "B08"])
             logging.info(f"{cube.to_json(indent=None)}")
 
             blue = cube.band("B02") * 0.0001
@@ -102,16 +101,30 @@ class TrackSpecIndex:
             nir = cube.band("B08") * 0.0001
             evi = 2.5 * (nir - red) / (nir + 6.0 * red - 7.5 * blue + 1.0)
 
-            scl = cube.band("SCL")
-            evi_masked = evi.mask(scl != 4)
+            
+            scl_cube = eo_connection.load_collection('SENTINEL2_L2A',
+                                             spatial_extent=spatial_ext,
+                                             temporal_extent=t,
+                                             bands=["SCL"])
+            
+            logging.info(f"{scl_cube.to_json(indent=None)}")
 
+            # mask everything except vegetation -> scl = 4
+            scl_band = scl_cube.band("SCL")
+            evi_masked = evi.mask(scl_band != 4)
+
+            # resample because the the SCL layer has a different sampling
+            # from the other layers
             mask_resampled = evi_masked.resample_cube_spatial(evi)
 
-            # Apply the mask to the `evi_cube`
+            # Apply the mask to the evi cube
             evi_cube_masked = evi.mask(mask_resampled)
 
             job = evi_cube_masked.create_job(title=f"EVI_{t[0]}", 
                                              out_format='NetCDF')
+
+            job = evi.create_job(title=f"EVI_{t[0]}", 
+                                out_format='NetCDF')
             
             job.start_and_wait()
 
