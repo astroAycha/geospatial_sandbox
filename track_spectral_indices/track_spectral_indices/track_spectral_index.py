@@ -12,10 +12,10 @@ class TrackSpecIndex:
     using relevant spectral indices
     """
 
-    def __init__(self, url):
+    def __init__(self):
         
         # set the connection url
-        # url = "openeo.dataspace.copernicus.eu/openeo/1.2"
+        url = "openeo.dataspace.copernicus.eu/openeo/1.2"
         self.url = url       
 
     def define_region(self, west, south, east, north):
