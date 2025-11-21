@@ -109,19 +109,6 @@ class TrackSpecIndex:
             
             logging.info(f"{scl_cube.to_json(indent=None)}")
 
-            # mask everything except vegetation -> scl = 4
-            scl_band = scl_cube.band("SCL")
-            evi_masked = evi.mask(scl_band != 4)
-
-            # resample because the the SCL layer has a different sampling
-            # from the other layers
-            mask_resampled = evi_masked.resample_cube_spatial(evi)
-
-            # Apply the mask to the evi cube
-            evi_cube_masked = evi.mask(mask_resampled)
-
-            job = evi_cube_masked.create_job(title=f"EVI_{t[0]}", 
-                                             out_format='NetCDF')
 
             job = evi.create_job(title=f"EVI_{t[0]}", 
                                 out_format='NetCDF')
