@@ -3,6 +3,7 @@
 import openeo
 from datetime import datetime, timedelta
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 
@@ -102,12 +103,12 @@ class TrackSpecIndex:
             evi = 2.5 * (nir - red) / (nir + 6.0 * red - 7.5 * blue + 1.0)
 
             
-            scl_cube = eo_connection.load_collection('SENTINEL2_L2A',
-                                             spatial_extent=spatial_ext,
-                                             temporal_extent=t,
-                                             bands=["SCL"])
+            # scl_cube = eo_connection.load_collection('SENTINEL2_L2A',
+            #                                  spatial_extent=spatial_ext,
+            #                                  temporal_extent=t,
+            #                                  bands=["SCL"])
             
-            logging.info(f"{scl_cube.to_json(indent=None)}")
+            # logging.info(f"{scl_cube.to_json(indent=None)}")
 
 
             job = evi.create_job(title=f"EVI_{t[0]}", 
@@ -115,7 +116,16 @@ class TrackSpecIndex:
             
             job.start_and_wait()
 
-            outfile = f"evi_{t[0]}.nc"
-            job.download_result(outfile)
+            # save the output to the Data dir
+            # create one if it does not exist
+            save_path = './Data/'
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            
+            file_name = f'evi_{t[0]}.nc'
+            results_file = os.path.join(save_path, file_name)
+
+            # download the results file
+            job.download_result(results_file)
 
     
